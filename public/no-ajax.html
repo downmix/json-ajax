@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <style>
+    #btnAddBookCle{
+      display: none;
+    }
+    #addBookInput{
+      display: none;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <h3>Book List</h3>
+
+      <table id="bookTable" class="table table-striped">
+        <tr class="bookTableHeader">
+          <th><input type="checkbox" id="bookCkAll"></th>
+          <th>#</th>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Price</th>
+        </tr>
+        <tbody id="bookTableBody">
+          
+        </tbody>
+      </table>
+      <input id="btnDelBook" class="btn btn-default" type="button" value="Delete Book">
+      <input id="btnAddBook" class="btn btn-default" type="button" value="Add Book">
+      <input id="btnAddBookCle" class="btn btn-default" type="button" value="Cancle">
+      
+      <div id="addBookInput">
+        <label class="control-label" for="inputId">Title</label>
+        <input id="inputId" class="form-control" type="text" placeholder="Title..">
+        <label class="control-label" for="inputAut">Author</label>
+        <input id="inputAut" class="form-control" type="text" placeholder="Author..">
+        <label class="control-label" for="inputAut">Price</label>
+        <input id="inputPri" class="form-control" type="text" placeholder="Price..">
+      </div>
+    </div>
+  </div>
+   
+  <script>
+    let bookList = [
+      { id: 1, title: 'HTML5', author: 'Lee', price: 2000 },
+      { id: 2, title: 'CSS3', author: 'Kim', price: 3000 },
+      { id: 3, title: 'JavaScript', author: 'Park', price: 5000 }
+    ];
+
+    const bookListCall = () => {
+      let bookListHtml = '';
+      bookList.map(book => {
+        bookListHtml += `<tr>
+          <td><input type="checkbox" id="${book.id}"></td>
+          <th>${book.id}</th>
+          <td>${book.title}</td>
+          <td>${book.author}</td>
+          <td>${book.price}</td>
+        </tr>`;
+      });
+
+      document.getElementById('bookTableBody').innerHTML = bookListHtml;
+    };
+
+    bookListCall();
+
+
+    document.getElementById('btnAddBook').addEventListener('click', () => {
+      let addBookInputFlg = document.getElementById('addBookInput').style.display;
+      
+      if(!addBookInputFlg || addBookInputFlg == 'none' ){
+        document.getElementById('btnAddBookCle').style.display = 'inline';
+        document.getElementById('addBookInput').style.display = 'block';
+      }else{
+        if(!document.getElementById('inputId').value){
+          alert('title은 필수입니다.');
+          return;
+        }
+
+        let addBook = {};
+        const list = [...document.querySelectorAll('#addBookInput input[type=text]')].map(val => {
+          let bookListCnt = bookList.length < 1 ? 0 : bookList[bookList.length-1].id;
+          
+          addBook.id = Math.max(bookListCnt) + 1;
+          if(val.id == 'inputId'){
+            addBook.title = val.value;
+          }else if(val.id == 'inputAut'){
+            addBook.author = val.value;
+          }else if(val.id == 'inputPri'){
+            addBook.price = val.value;
+          }
+
+          return addBook;
+        })
+        
+        const addBookInput = [...document.querySelectorAll('#addBookInput input[type=text]')].map(val => {
+          val.value = '';
+        });
+
+        bookList.push(addBook);
+      }
+      console.log('[ bookList ] >>', bookList );
+      bookListCall();
+    })
+
+    document.getElementById('btnAddBookCle').addEventListener('click', () => {
+      document.getElementById('btnAddBookCle').style.display = 'none';
+      document.getElementById('addBookInput').style.display = 'none';
+    })
+
+    document.getElementById('bookCkAll').addEventListener('click', (e) => {
+      [...document.querySelectorAll('#bookTable td input[type=checkbox]')].map(val => {
+        val.checked = e.target.checked;
+      });
+    });
+
+    document.getElementById('btnDelBook').addEventListener('click', () => {
+      let delBookList = [...document.querySelectorAll('#bookTable td input[type=checkbox]:checked')].map(val => {
+        return parseInt(val.id);
+      });
+      
+      bookList = bookList.filter(val => {
+        return delBookList.indexOf(val.id) < 0;
+      });
+
+      bookListCall();
+    });
+
+    //[...document.querySelectorAll('#bookTable td input[type=checkbox]:checked')]
+    //temp.children[1].children[1].remove()
+    //document.querySelectorAll('#bookTable tr:nth-of-type(1):not(.bookTableHeader)')
+
+    /*
+      `<tr>
+        <td><input type="checkbox" id="${book.id}"></td>
+        <th>${book.id}</th>
+        <td>${book.title}</td>
+        <td>${book.author}</td>
+        <td>${book.price}</td>
+      </tr>`
+    */
+
+    // 1. Delete Book 버튼이 클릭되면 체크된 book 리스트를 삭제
+    // 2. 최상위 체크박스를 클릭하면 전체 체크박스 토글(on/off)
+    // 3. Add Book 버튼이 클릭되면 .add-form를 표시
+    // 4. Add Book 버튼이 클릭되면 Cancel 버튼 표시
+    // 5. .add-form이 표시된 상태에서 필수입력 대상인 Title이 입력되었으면 Add Book 버튼이 클릭 시, bookList 객체에 .add-form의 입력값을 추가하고 DOM 갱신
+    // 6. .add-form이 표시된 상태에서 필수입력 대상인 Title이 입력되지 않았으면 alert으로 입력되지 않았음을 경고
+    // 7. Cancel 버튼이 클릭되면 .add-form과 Cancel 버튼 비표시
+    // (*) 모든 선언문의 전역 선언 금지
+  </script>
+</body>
+</html>
