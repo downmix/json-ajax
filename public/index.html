@@ -49,9 +49,14 @@
   </div>
    
   <script>
+    /*------------------------------------*/
+    /* 도서 리스트 출력, 삭제, 입력 구현 */
+    /* NO 통신 >> Ajax통신 컨버전 */
     let bookList;
     const req = new XMLHttpRequest();
-
+    
+    /*------------------------------------*/
+    /* [ 리스트 JONS 리플래시 ] */
     const bookListLoad = () => {
       req.open('GET', '/bookList', true);
       req.send();
@@ -65,7 +70,9 @@
         }
       }
     };
-
+    
+    /*------------------------------------*/
+    /* [ JSON을 가공 > DOM 입력 ] */
     const bookListCall = () => {
       let bookListHtml = '';
       bookList.map(book => {
@@ -81,6 +88,8 @@
       document.getElementById('bookTableBody').innerHTML = bookListHtml;
     };
 
+    /*------------------------------------*/
+    /* [ 버튼 add Book ] */
     document.getElementById('btnAddBook').addEventListener('click', () => {
       let addBookInputFlg = document.getElementById('addBookInput').style.display;
       
@@ -124,23 +133,26 @@
             }
           }
         }
-        //bookList.push();
       }
-      //console.log('[ bookList ] >>', bookList );
-      //bookListCall();
     })
 
+    /*------------------------------------*/
+    /* [ 버튼 cancle 책입력 가리기 ] */
     document.getElementById('btnAddBookCle').addEventListener('click', () => {
       document.getElementById('btnAddBookCle').style.display = 'none';
       document.getElementById('addBookInput').style.display = 'none';
     })
 
+    /*------------------------------------*/
+    /* [ 리스트 전체선택 ] */
     document.getElementById('bookCkAll').addEventListener('click', (e) => {
       [...document.querySelectorAll('#bookTable td input[type=checkbox]')].map(val => {
         val.checked = e.target.checked;
       });
     });
 
+    /*------------------------------------*/
+    /* [ book 제거 > 체크박스 선택된 항목 ] */
     document.getElementById('btnDelBook').addEventListener('click', () => {
       let delBookList = [...document.querySelectorAll('#bookTable td input[type=checkbox]:checked')].map(val => {
         return parseInt(val.id);
@@ -167,6 +179,8 @@
       bookListCall();
     });
 
+    /*------------------------------------*/
+    /* [ start ] */
     bookListLoad();
   </script>
 </body>
